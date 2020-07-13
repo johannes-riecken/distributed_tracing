@@ -140,19 +140,15 @@ TEST_F(GraphTest, ex7) {
 }
 // 8. The length of the shortest trace (in terms of latency) between A and C.
 TEST_F(GraphTest, ex8) {
-    auto nodes = Graph::NODES;
-    auto traces = g->traces('A', 'C', 0, nodes.size());
-    int min_latency = 999999;
-    for (const auto& trace : traces) {
-        int latency = *g->average_latency(trace);
-        min_latency = latency < min_latency ? latency : min_latency;
-    }
+    auto traces = g->traces('A', 'C', 0, Graph::NODES.size());
+    auto shortest_trace_ptr = min_element(traces.begin(), traces.end(), [&](vector<char> a, vector<char> b){return *g->average_latency(a) < *g->average_latency(b);});
+    auto min_latency = *g->average_latency(*shortest_trace_ptr);
     ASSERT_EQ(min_latency, 9);
 }
 // 9. The length of the shortest trace (in terms of latency) between B and B.
 TEST_F(GraphTest, ex9) {
     auto traces = g->traces('B', 'B', 0, Graph::NODES.size());
-    auto shortest_trace_ptr = min(traces.begin(), traces.end(), [&](auto a, auto b){return *g->average_latency(*a) < *g->average_latency(*b);});
+    auto shortest_trace_ptr = min_element(traces.begin(), traces.end(), [&](auto a, auto b){return *g->average_latency(a) < *g->average_latency(b);});
     auto min_latency = *g->average_latency(*shortest_trace_ptr);
     ASSERT_EQ(min_latency, 9);
 }
