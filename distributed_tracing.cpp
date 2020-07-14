@@ -1,14 +1,15 @@
-// vim: set path+=/usr/src/googletest/googletest/include :
-// vim: set path+=/usr/include/octave-4.4.0/octave/ :
-#include "gtest/gtest.h"
-
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <iterator>
+#include <map>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include "gtest/gtest.h"
 
 using namespace std;
 
@@ -29,25 +30,20 @@ class Graph {
             }
         }
 
-        unique_ptr<int> average_latency(const vector<char>& trace) {
+        optional<int> average_latency(const vector<char>& trace) {
             int latency = 0;
             vector<string> edges {};
-            for (int i = 0; i < trace.size() - 1; ++i) {
-                stringstream ss {};
-                ss << trace[i] << trace[i + 1];
-                edges.push_back(ss.str());
-            }
+            transform(trace.begin(), trace.end() - 1, trace.begin() + 1, back_inserter(edges), [](char a, char b) { return ""s + a + b; });
             for (const string& edge : edges) {
-                auto it = graph.find(edge);
-                if (it == graph.end()) {
-                    return nullptr;
+                if (graph.find(edge) == graph.end()) {
+                    return nullopt;
                 }
                 latency += graph[edge];
             }
-            return make_unique<int>(latency);
+            return optional<int>{latency};
         }
 
-        vector<vector<char>> traces(char start_node, char end_node, int min_hops, int max_hops, int max_latency = 999999) {
+        vector<vector<char>> traces(char start_node, char end_node, int min_hops, int max_hops, int max_latency = numeric_limits<int>().max()) {
             vector<vector<char>> frontier { { start_node } };
             vector<vector<char>> ret {};
             int n_hops = 0;
@@ -55,14 +51,14 @@ class Graph {
                 vector<vector<char>> new_frontier {};
                 for (auto nodes : frontier) {
                     for (auto dest : NODES) {
-                        stringstream ss {};
-                        ss << nodes.back() << dest;
-                        if (graph.find(ss.str()) != graph.end()) {
-                            vector<char> candidate { nodes };
-                            candidate.push_back(dest);
-                            if (*average_latency(candidate) <= max_latency) {
-                                new_frontier.push_back(candidate);
-                            }
+                        if (graph.find(""s + nodes.back() + dest) == graph.end()) {
+                            continue;
+                        }
+
+                        vector<char> candidate { nodes };
+                        candidate.push_back(dest);
+                        if (*average_latency(candidate) <= max_latency) {
+                            new_frontier.push_back(candidate);
                         }
                     }
                 }
@@ -70,14 +66,13 @@ class Graph {
                 if (new_frontier.empty()) {
                     break;
                 }
+
                 n_hops += 1;
                 if (n_hops >= min_hops) {
                     vector<vector<char>> filtered_frontier {};
-                    for (auto nodes : frontier) {
-                        if (nodes.back() == end_node) {
-                            filtered_frontier.push_back(nodes);
-                        }
-                    }
+                    copy_if(frontier.begin(), frontier.end(), back_inserter(filtered_frontier), [&](const auto& nodes) {
+                        return (nodes.back() == end_node);
+                    });
                     ret.insert(ret.end(), filtered_frontier.begin(), filtered_frontier.end());
                 }
             }
@@ -123,7 +118,7 @@ TEST_F(GraphTest, ex4) {
 
 // 5. The average latency of the trace A-E-D.
 TEST_F(GraphTest, ex5) {
-    ASSERT_EQ(g->average_latency(vector<char> {'A', 'E', 'D'}), nullptr);
+    ASSERT_EQ(g->average_latency(vector<char> {'A', 'E', 'D'}), nullopt);
 }
 // 6. The number of traces originating in service C and ending in service C with a maximum of
 // 3 hops. In the sample data below there are two such traces: C-D-C (2 stops) and
@@ -157,7 +152,7 @@ TEST_F(GraphTest, ex9) {
 // the same data, the traces are C-D-C, C-E-B-C, C-E-B-C-D-C, C-D-C-E-B-C, C-D-E-B-C,
 // C-E-B-C-E-B-C, C-E-B-C-E-B-C-E-B-C.
 TEST_F(GraphTest, ex10) {
-    auto traces = g->traces('C', 'C', 0, 999999, 29);
+    auto traces = g->traces('C', 'C', 0, numeric_limits<int>().max(), 29);
     auto count = count_if(traces.begin(), traces.end(), [&](auto trace){return *g->average_latency(trace) < 30;});
     ASSERT_EQ(count, 7);
 }
