@@ -70,15 +70,19 @@ public:
       // nodes connected by edges added if they don't have a too high average
       // latency
       // check if we should use emplace and move semantics
-      vector<vector<char>> new_frontier{frontier};
-      for (auto& nodes : new_frontier)
-        for (const auto& dest : NODES)
-          nodes.push_back(dest);
+      vector<vector<char>> new_frontier{};
+      for (auto nodes : frontier)
+        for (const auto dest : NODES) {
+          vector<char> nodes_copy{nodes};
+          nodes_copy.emplace_back(dest);
+          new_frontier.emplace_back(nodes_copy);
+        }
 
-      remove_if(new_frontier.begin(), new_frontier.end(), [this, &max_latency](const auto& nodes) {
+
+      new_frontier.erase(remove_if(new_frontier.begin(), new_frontier.end(), [this, &max_latency](const auto& nodes) {
           return graph.find(""s + nodes[nodes.size() - 2] + nodes.back()) == graph.end() || *average_latency(nodes) > max_latency;
-          });
-      copy(new_frontier.begin(), new_frontier.end(), back_inserter(frontier));
+          }), new_frontier.end());
+      frontier = new_frontier;
       if (new_frontier.empty()) {
         break;
       }
