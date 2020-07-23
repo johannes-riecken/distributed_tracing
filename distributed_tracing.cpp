@@ -102,7 +102,7 @@ string to_string(const optional<int> latency) {
   if (latency) {
     ss << *latency;
   } else {
-    ss << "NO TRACE FOUND";
+    ss << "NO SUCH TRACE";
   }
   return ss.str();
 }
