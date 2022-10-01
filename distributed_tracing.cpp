@@ -83,17 +83,19 @@ Graph<Vertex>::Graph(string &edges_str) {
     istringstream ss{edges_str};
     istream_iterator<string> it{ss};
     copy(it, istream_iterator<string>{}, back_inserter(edges));
-    transform(edges.begin(), edges.end(), inserter(graph, graph.begin()), [](const auto &e) {
-        return make_pair<string, int>(e.substr(0, 2), stoi(e.substr(2)));
+    transform(edges.begin(), edges.end(), inserter(graph, graph.begin()), [](const string &e) {
+        char a = e[0];
+        char b = e[1];
+        return make_pair<pair<char, char>, int>(pair<char, char>(a, b), stoi(e.substr(2)));
     });
 }
 
 template <class Vertex>
 optional<int> Graph<Vertex>::average_latency(const vector<char> &trace) const {
     int latency = 0;
-    vector<string> edges{};
+    vector<pair<char, char>> edges{};
     transform(trace.begin(), trace.end() - 1, trace.begin() + 1,
-              back_inserter(edges), [](char a, char b) { return ""s + a + b; });
+              back_inserter(edges), [](char a, char b) { return pair<char, char>(a, b); });
     auto f = find_if(edges.begin(), edges.end(), [&](const auto& edge){if (graph.find(edge) == graph.end()) {
         return true;
     }
@@ -124,7 +126,7 @@ vector<vector<char>> Graph<Vertex>::traces(const char start_node, const char end
 
 
         new_frontier.erase(remove_if(new_frontier.begin(), new_frontier.end(), [this, &max_latency](const auto& nodes) {
-            return graph.find(""s + nodes[nodes.size() - 2] + nodes.back()) == graph.end() || *average_latency(nodes) > max_latency;
+            return graph.find(pair(nodes[nodes.size() - 2], nodes.back())) == graph.end() || *average_latency(nodes) > max_latency;
         }), new_frontier.end());
         frontier = new_frontier;
         if (new_frontier.empty()) {
@@ -147,8 +149,8 @@ vector<vector<char>> Graph<Vertex>::traces(const char start_node, const char end
 template <class Vertex>
 vector<Vertex> Graph<Vertex>::vertices() const {
     set<char> m{};
-    transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first[0]; });
-    transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first[1]; });
+    transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.first; });
+    transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.second; });
     vector<char> ret{};
     copy(m.begin(), m.end(), back_inserter(ret));
     return ret;

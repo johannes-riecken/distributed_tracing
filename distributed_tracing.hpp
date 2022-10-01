@@ -20,5 +20,5 @@ public:
 
   [[nodiscard]] vector<Vertex> vertices() const;
 private:
-    map<string, int> graph{};
+    map<pair<char, char>, int> graph{};
 };
