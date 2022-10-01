@@ -75,18 +75,29 @@ using namespace std;
 /*   /1* ::testing::InitGoogleTest(&argc, argv); *1/ */
 /*   /1* return RUN_ALL_TESTS(); *1/ */
 /* } */
-template<> Graph<char>::Graph(string &edges_str) {
+vector<pair<pair<char, char>, int>> parse_edges_str(string &edges_str) {
     vector<string> edges{};
     string token;
     replace(edges_str.begin(), edges_str.end(), ',', ' ');
     istringstream ss{edges_str};
     istream_iterator<string> it{ss};
     copy(it, istream_iterator<string>{}, back_inserter(edges));
-    transform(edges.begin(), edges.end(), inserter(graph, graph.begin()), [](const string &e) {
+    vector<pair<pair<char, char>, int>> edges_parsed{};
+    transform(edges.begin(), edges.end(), back_inserter(edges_parsed), [](const string &e) {
         char a = e[0];
         char b = e[1];
         return make_pair<pair<char, char>, int>(pair<char, char>(a, b), stoi(e.substr(2)));
     });
+    return edges_parsed;
+}
+
+Graph<char> from_edges_str(string &edges_str) {
+    auto edges_parsed = parse_edges_str(edges_str);
+    return Graph<char>(edges_parsed);
+}
+
+template<regular Vertex>
+Graph<Vertex>::Graph(vector<pair<pair<Vertex, Vertex>, int>> &edges) : graph(edges.begin(), edges.end()) {
 }
 
 template <regular Vertex>

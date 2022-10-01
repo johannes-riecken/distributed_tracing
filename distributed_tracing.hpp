@@ -28,7 +28,7 @@ template <regular Vertex>
 class Graph {
 public:
 
-  explicit Graph<Vertex>(string &edges_str);
+  explicit Graph<Vertex>(vector<pair<pair<Vertex, Vertex>, int>> &edges);
 
   [[nodiscard]] optional<int> average_latency(const vector<Vertex> &trace) const;
 
@@ -39,4 +39,7 @@ public:
   [[nodiscard]] vector<Vertex> vertices() const;
 private:
     unordered_map<pair<Vertex, Vertex>, int, pair_hash> graph{};
+
 };
+
+Graph<char> from_edges_str(string &edges_str);

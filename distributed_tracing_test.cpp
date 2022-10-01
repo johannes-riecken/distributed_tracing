@@ -14,7 +14,7 @@ protected:
     GraphTest() = default;
   void SetUp() override {
     string s{"AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"s};
-    g = make_unique<Graph<char>>(Graph<char>(s));
+    g = make_unique<Graph<char>>(from_edges_str(s));
   }
 };
 
