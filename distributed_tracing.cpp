@@ -16,7 +16,7 @@
 #include <optional>
 #include <sstream>
 #include <tuple>
-#include <set>
+#include <unordered_set>
 
 #include "distributed_tracing.hpp"
 
@@ -75,8 +75,7 @@ using namespace std;
 /*   /1* ::testing::InitGoogleTest(&argc, argv); *1/ */
 /*   /1* return RUN_ALL_TESTS(); *1/ */
 /* } */
-template <class Vertex>
-Graph<Vertex>::Graph(string &edges_str) {
+template<> Graph<char>::Graph(string &edges_str) {
     vector<string> edges{};
     string token;
     replace(edges_str.begin(), edges_str.end(), ',', ' ');
@@ -90,12 +89,12 @@ Graph<Vertex>::Graph(string &edges_str) {
     });
 }
 
-template <class Vertex>
-optional<int> Graph<Vertex>::average_latency(const vector<char> &trace) const {
+template <regular Vertex>
+optional<int> Graph<Vertex>::average_latency(const vector<Vertex> &trace) const {
     int latency = 0;
-    vector<pair<char, char>> edges{};
+    vector<pair<Vertex, Vertex>> edges{};
     transform(trace.begin(), trace.end() - 1, trace.begin() + 1,
-              back_inserter(edges), [](char a, char b) { return pair<char, char>(a, b); });
+              back_inserter(edges), [](Vertex a, Vertex b) { return pair<Vertex, Vertex>(a, b); });
     auto f = find_if(edges.begin(), edges.end(), [&](const auto& edge){if (graph.find(edge) == graph.end()) {
         return true;
     }
@@ -105,21 +104,21 @@ optional<int> Graph<Vertex>::average_latency(const vector<char> &trace) const {
     return f == edges.end() ? optional<int>(latency) : nullopt;
 }
 
-template <class Vertex>
-vector<vector<char>> Graph<Vertex>::traces(const char start_node, const char end_node, const int min_hops, const int max_hops,
+template <regular Vertex>
+vector<vector<Vertex>> Graph<Vertex>::traces(const Vertex start_node, const Vertex end_node, const int min_hops, const int max_hops,
                                    const int max_latency) const {
-    vector<vector<char>> frontier{{start_node}};
-    vector<vector<char>> ret{};
+    vector<vector<Vertex>> frontier{{start_node}};
+    vector<vector<Vertex>> ret{};
     int n_hops = 0;
     while (n_hops < max_hops) {
         // for all node lists in the frontier, add all node lists with the new
         // nodes connected by edges added if they don't have a too high average
         // latency
         // check if we should use emplace and move semantics
-        vector<vector<char>> new_frontier{};
+        vector<vector<Vertex>> new_frontier{};
         for (const auto& nodes : frontier)
             for (const auto dest : vertices()) {
-                vector<char> nodes_copy{nodes};
+                vector<Vertex> nodes_copy{nodes};
                 nodes_copy.emplace_back(dest);
                 new_frontier.emplace_back(nodes_copy);
             }
@@ -135,7 +134,7 @@ vector<vector<char>> Graph<Vertex>::traces(const char start_node, const char end
 
         n_hops += 1;
         if (n_hops >= min_hops) {
-            vector<vector<char>> filtered_frontier{};
+            vector<vector<Vertex>> filtered_frontier{};
             copy_if(frontier.begin(), frontier.end(),
                     back_inserter(filtered_frontier),
                     [&](const auto &nodes) { return (nodes.back() == end_node); });
@@ -146,14 +145,59 @@ vector<vector<char>> Graph<Vertex>::traces(const char start_node, const char end
     return ret;
 }
 
-template <class Vertex>
+template <regular Vertex>
 vector<Vertex> Graph<Vertex>::vertices() const {
-    set<char> m{};
+    unordered_set<Vertex> m{};
     transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.first; });
     transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.second; });
-    vector<char> ret{};
+    vector<Vertex> ret{};
     copy(m.begin(), m.end(), back_inserter(ret));
     return ret;
 }
 
+class A
+{
+    struct Rslt {
+        /* operator A() { return {}; } */
+        Rslt(Rslt&&) = delete;
+        void operator&() const = delete;
+        friend void operator,(Rslt, Rslt) = delete;
+    };
+
+    static Rslt make() { throw 0; }
+
+public:
+//    A() = delete;
+//    A(A&&) = delete;
+//    A(A const&) = delete;
+//    A& operator=(A &&) = delete;
+//    A& operator=(A const&) = delete;
+    /* ~A() = delete; */
+    /* A() = default; */
+    /* A(A&&) = default; */
+    /* A(A const&) = default; */
+    /* A& operator=(A &&) = default; */
+    /* A& operator=(A const&) = default; */
+    /* ~A() = default; */
+
+    void operator&() const = delete;
+    friend void operator,(A const&, A const&) = delete;
+    // implement equality operators
+    friend bool operator==(A const&, A const&) = default;
+
+//    A& operator+=(A const&) { return *this; }
+//    friend Rslt operator+(A, A) { return make(); }
+//
+//    friend auto operator<=>(A const&, A const&) = default;
+};
+
+// std::hash implementation for A
+namespace std {
+    template <>
+    struct hash<A> {
+        size_t operator()(A const&) const { return 0; }
+    };
+}
+
 template class Graph<char>;
+template class Graph<A>;
