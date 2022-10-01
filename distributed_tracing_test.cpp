@@ -9,7 +9,7 @@ using namespace std;
 class GraphTest : public ::testing::Test {
 protected:
   unique_ptr<Graph> g;
-  GraphTest() {}
+  GraphTest() = default;
   void SetUp() override {
     string s{"AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"s};
     g = make_unique<Graph>(Graph(s));
@@ -60,7 +60,7 @@ TEST_F(GraphTest, ex7) { ASSERT_EQ(g->traces('A', 'C', 4, 4).size(), 3); }
 TEST_F(GraphTest, ex8) {
   auto traces = g->traces('A', 'C', 0, Graph::NODES.size());
   auto shortest_trace_ptr = min_element(
-      traces.begin(), traces.end(), [&](vector<char> a, vector<char> b) {
+      traces.begin(), traces.end(), [&](const vector<char>& a, const vector<char>& b) {
         return *g->average_latency(a) < *g->average_latency(b);
       });
   auto min_latency = *g->average_latency(*shortest_trace_ptr);
@@ -82,7 +82,7 @@ TEST_F(GraphTest, ex9) {
 // less than 30. In the same data, the traces are C-D-C, C-E-B-C, * C-E-B-C-D-C,
 // C-D-C-E-B-C, C-D-E-B-C, C-E-B-C-E-B-C, C-E-B-C-E-B-C-E-B-C.
 TEST_F(GraphTest, ex10) {
-  auto traces = g->traces('C', 'C', 0, numeric_limits<int>().max(), 29);
+  auto traces = g->traces('C', 'C', 0, numeric_limits<int>::max(), 29);
   auto count = count_if(traces.begin(), traces.end(), [&](auto trace) {
     return *g->average_latency(trace) < 30;
   });

@@ -11,25 +11,17 @@
 // - Improve the complexity of some algorithms (I'm aware of Dijkstra's
 // algorithm)
 // - Minor amendments like giving more variables `const` and `auto` qualifiers
-#include <algorithm>
-#include <array>
 #include <fstream>
 #include <iostream>
-#include <iterator>
-#include <limits>
-#include <map>
-#include <memory>
 #include <optional>
 #include <sstream>
-#include <string>
 #include <tuple>
-#include <vector>
 
 #include "distributed_tracing.hpp"
 
 using namespace std;
 
-string to_string(const optional<int> latency) {
+[[maybe_unused]] string to_string(const optional<int> latency) {
   stringstream ss;
   if (latency) {
     ss << *latency;

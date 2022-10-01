@@ -2,6 +2,7 @@
 #include <vector>
 #include <optional>
 #include <array>
+#include <map>
 
 using namespace std;
 
@@ -22,7 +23,7 @@ public:
     });
   }
 
-  optional<int> average_latency(const vector<char> &trace) const {
+  [[nodiscard]] optional<int> average_latency(const vector<char> &trace) const {
     int latency = 0;
     vector<string> edges{};
     transform(trace.begin(), trace.end() - 1, trace.begin() + 1,
@@ -36,9 +37,9 @@ public:
     return f == edges.end() ? optional<int>(latency) : nullopt;
   }
 
-  vector<vector<char>> traces(const char start_node, const char end_node, const int min_hops,
+  [[nodiscard]] vector<vector<char>> traces(const char start_node, const char end_node, const int min_hops,
                               const int max_hops,
-                              const int max_latency = numeric_limits<int>().max()) const {
+                              const int max_latency = numeric_limits<int>::max()) const {
     vector<vector<char>> frontier{{start_node}};
     vector<vector<char>> ret{};
     int n_hops = 0;
@@ -48,7 +49,7 @@ public:
       // latency
       // check if we should use emplace and move semantics
       vector<vector<char>> new_frontier{};
-      for (auto nodes : frontier)
+      for (const auto& nodes : frontier)
         for (const auto dest : NODES) {
           vector<char> nodes_copy{nodes};
           nodes_copy.emplace_back(dest);

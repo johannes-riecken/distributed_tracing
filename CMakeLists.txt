@@ -6,7 +6,7 @@ find_library(GTEST_LIBRARY gtest)
 
 enable_testing()
 
-add_executable(distributed_tracing_test distributed_tracing_test.cpp)
+add_executable(distributed_tracing_test distributed_tracing_test.cpp distributed_tracing.cpp)
 
 target_link_libraries(distributed_tracing_test gtest pthread)
 
