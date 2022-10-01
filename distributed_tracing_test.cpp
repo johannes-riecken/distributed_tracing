@@ -8,13 +8,13 @@ using namespace std;
 
 class GraphTest : public ::testing::Test {
 protected:
-  unique_ptr<Graph> g;
+  unique_ptr<Graph<char>> g;
   static constexpr array<const char, 5> NODES{{'A', 'B', 'C', 'D', 'E'}};
 
     GraphTest() = default;
   void SetUp() override {
     string s{"AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"s};
-    g = make_unique<Graph>(Graph(s));
+    g = make_unique<Graph<char>>(Graph<char>(s));
   }
 };
 
@@ -90,4 +90,3 @@ TEST_F(GraphTest, ex10) {
   });
   ASSERT_EQ(count, 7);
 }
-

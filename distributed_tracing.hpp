@@ -6,10 +6,11 @@
 
 using namespace std;
 
+template <class Vertex>
 class Graph {
 public:
 
-  explicit Graph(string &edges_str);
+  explicit Graph<Vertex>(string &edges_str);
 
   [[nodiscard]] optional<int> average_latency(const vector<char> &trace) const;
 
@@ -17,7 +18,7 @@ public:
                               int max_hops,
                               int max_latency = numeric_limits<int>::max()) const;
 
-  [[nodiscard]] vector<char> vertices() const;
+  [[nodiscard]] vector<Vertex> vertices() const;
 private:
     map<string, int> graph{};
 };

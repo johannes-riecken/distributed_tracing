@@ -75,7 +75,8 @@ using namespace std;
 /*   /1* ::testing::InitGoogleTest(&argc, argv); *1/ */
 /*   /1* return RUN_ALL_TESTS(); *1/ */
 /* } */
-Graph::Graph(string &edges_str) {
+template <class Vertex>
+Graph<Vertex>::Graph(string &edges_str) {
     vector<string> edges{};
     string token;
     replace(edges_str.begin(), edges_str.end(), ',', ' ');
@@ -87,7 +88,8 @@ Graph::Graph(string &edges_str) {
     });
 }
 
-optional<int> Graph::average_latency(const vector<char> &trace) const {
+template <class Vertex>
+optional<int> Graph<Vertex>::average_latency(const vector<char> &trace) const {
     int latency = 0;
     vector<string> edges{};
     transform(trace.begin(), trace.end() - 1, trace.begin() + 1,
@@ -101,7 +103,8 @@ optional<int> Graph::average_latency(const vector<char> &trace) const {
     return f == edges.end() ? optional<int>(latency) : nullopt;
 }
 
-vector<vector<char>> Graph::traces(const char start_node, const char end_node, const int min_hops, const int max_hops,
+template <class Vertex>
+vector<vector<char>> Graph<Vertex>::traces(const char start_node, const char end_node, const int min_hops, const int max_hops,
                                    const int max_latency) const {
     vector<vector<char>> frontier{{start_node}};
     vector<vector<char>> ret{};
@@ -141,7 +144,8 @@ vector<vector<char>> Graph::traces(const char start_node, const char end_node, c
     return ret;
 }
 
-vector<char> Graph::vertices() const {
+template <class Vertex>
+vector<Vertex> Graph<Vertex>::vertices() const {
     set<char> m{};
     transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first[0]; });
     transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first[1]; });
@@ -149,3 +153,5 @@ vector<char> Graph::vertices() const {
     copy(m.begin(), m.end(), back_inserter(ret));
     return ret;
 }
+
+template class Graph<char>;
