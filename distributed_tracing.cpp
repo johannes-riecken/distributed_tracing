@@ -16,6 +16,7 @@
 #include <optional>
 #include <sstream>
 #include <tuple>
+#include <set>
 
 #include "distributed_tracing.hpp"
 
@@ -112,7 +113,7 @@ vector<vector<char>> Graph::traces(const char start_node, const char end_node, c
         // check if we should use emplace and move semantics
         vector<vector<char>> new_frontier{};
         for (const auto& nodes : frontier)
-            for (const auto dest : NODES) {
+            for (const auto dest : vertices()) {
                 vector<char> nodes_copy{nodes};
                 nodes_copy.emplace_back(dest);
                 new_frontier.emplace_back(nodes_copy);
@@ -137,5 +138,14 @@ vector<vector<char>> Graph::traces(const char start_node, const char end_node, c
                        filtered_frontier.end());
         }
     }
+    return ret;
+}
+
+vector<char> Graph::vertices() const {
+    set<char> m{};
+    transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first[0]; });
+    transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first[1]; });
+    vector<char> ret{};
+    copy(m.begin(), m.end(), back_inserter(ret));
     return ret;
 }

@@ -9,7 +9,9 @@ using namespace std;
 class GraphTest : public ::testing::Test {
 protected:
   unique_ptr<Graph> g;
-  GraphTest() = default;
+  static constexpr array<const char, 5> NODES{{'A', 'B', 'C', 'D', 'E'}};
+
+    GraphTest() = default;
   void SetUp() override {
     string s{"AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"s};
     g = make_unique<Graph>(Graph(s));
@@ -58,7 +60,7 @@ TEST_F(GraphTest, ex7) { ASSERT_EQ(g->traces('A', 'C', 4, 4).size(), 3); }
 
 // 8. The length of the shortest trace (in terms of latency) between A and C.
 TEST_F(GraphTest, ex8) {
-  auto traces = g->traces('A', 'C', 0, Graph::NODES.size());
+  auto traces = g->traces('A', 'C', 0, NODES.size());
   auto shortest_trace_ptr = min_element(
       traces.begin(), traces.end(), [&](const vector<char>& a, const vector<char>& b) {
         return *g->average_latency(a) < *g->average_latency(b);
@@ -69,7 +71,7 @@ TEST_F(GraphTest, ex8) {
 
 // 9. The length of the shortest trace (in terms of latency) between B and B.
 TEST_F(GraphTest, ex9) {
-  auto traces = g->traces('B', 'B', 0, Graph::NODES.size());
+  auto traces = g->traces('B', 'B', 0, NODES.size());
   auto shortest_trace_ptr =
       min_element(traces.begin(), traces.end(), [&](auto a, auto b) {
         return *g->average_latency(a) < *g->average_latency(b);
