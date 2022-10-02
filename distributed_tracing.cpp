@@ -11,6 +11,7 @@
 // - Improve the complexity of some algorithms (I'm aware of Dijkstra's
 // algorithm)
 // - Minor amendments like giving more variables `const` and `auto` qualifiers
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <optional>
@@ -18,6 +19,7 @@
 #include <tuple>
 #include <unordered_set>
 #include <set>
+#include <iterator>
 
 #include "distributed_tracing.hpp"
 
@@ -76,11 +78,14 @@ using namespace std;
 /*   /1* ::testing::InitGoogleTest(&argc, argv); *1/ */
 /*   /1* return RUN_ALL_TESTS(); *1/ */
 /* } */
-vector<pair<pair<char, char>, int>> parse_edges_str(string &edges_str) {
+pair<vector<pair<pair<char, char>, int>>::iterator,
+        vector<pair<pair<char, char>, int>>::iterator> parse_edges_str(const string &edges_str) {
     vector<string> edges{};
     string token;
-    replace(edges_str.begin(), edges_str.end(), ',', ' ');
-    istringstream ss{edges_str};
+    string edges_str_new;
+    copy(edges_str.begin(), edges_str.end(), back_inserter(edges_str_new));
+    replace(edges_str_new.begin(), edges_str_new.end(), ',', ' ');
+    istringstream ss{edges_str_new};
     istream_iterator<string> it{ss};
     copy(it, istream_iterator<string>{}, back_inserter(edges));
     vector<pair<pair<char, char>, int>> edges_parsed{};
@@ -89,34 +94,36 @@ vector<pair<pair<char, char>, int>> parse_edges_str(string &edges_str) {
         char b = e[1];
         return make_pair<pair<char, char>, int>(pair<char, char>(a, b), stoi(e.substr(2)));
     });
-    return edges_parsed;
+    return {edges_parsed.begin(), edges_parsed.end()};
 }
 
-Graph<set<pair<pair<char, char>, int>>, char> from_edges_str(string &edges_str) {
-    auto edges_parsed = parse_edges_str(edges_str);
-    return Graph<set<pair<pair<char, char>, int>>, char>(edges_parsed);
+template<input_iterator Iterator, regular Vertex>
+Graph<Iterator, Vertex>::Graph(Iterator ei_begin, Iterator ei_end) : graph{ei_begin, ei_end}
+{
 }
 
-template<class Iterator, regular Vertex>
-Graph<Iterator, Vertex>::Graph(vector<pair<pair<Vertex, Vertex>, int>> &edges) : graph(edges.begin(), edges.end()) {
+Graph<vector<pair<pair<char, char>, int>>::iterator, char> from_edges_str(const string &edges_str) {
+    auto [ei_begin, ei_end] = parse_edges_str(edges_str);
+    return Graph<vector<pair<pair<char, char>, int>>::iterator, char>{ei_begin, ei_end};
 }
 
-template <class Iterator, regular Vertex>
+template <input_iterator Iterator, regular Vertex>
 optional<int> Graph<Iterator, Vertex>::average_latency(const vector<Vertex> &trace) const {
     int latency = 0;
     vector<pair<Vertex, Vertex>> edges{};
     transform(trace.begin(), trace.end() - 1, trace.begin() + 1,
               back_inserter(edges), [](Vertex a, Vertex b) { return pair<Vertex, Vertex>(a, b); });
-    auto f = find_if(edges.begin(), edges.end(), [&](const auto& edge){if (graph.find(edge) == graph.end()) {
-        return true;
-    }
-        latency += (*graph.find(edge)).second;
-        return false;
-    });
+    auto f = find_if(edges.begin(), edges.end(), [&](const auto& edge){
+        if (graph.find(edge) == graph.end()) {
+            return true;
+        }
+            latency += (*graph.find(edge)).second;
+            return false;
+        });
     return f == edges.end() ? optional<int>(latency) : nullopt;
 }
 
-template <class Iterator, regular Vertex>
+template <input_iterator Iterator, regular Vertex>
 vector<vector<Vertex>> Graph<Iterator, Vertex>::traces(const Vertex start_node, const Vertex end_node, const int min_hops, const int max_hops,
                                    const int max_latency) const {
     vector<vector<Vertex>> frontier{{start_node}};
@@ -157,7 +164,7 @@ vector<vector<Vertex>> Graph<Iterator, Vertex>::traces(const Vertex start_node, 
     return ret;
 }
 
-template <class Iterator, regular Vertex>
+template <input_iterator Iterator, regular Vertex>
 vector<Vertex> Graph<Iterator, Vertex>::vertices() const {
     unordered_set<Vertex> m{};
     transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.first; });
@@ -211,5 +218,6 @@ namespace std {
     };
 }
 
-template class Graph<set<pair<pair<char, char>, int>>, char>;
-template class Graph<set<pair<pair<char, char>, int>>, A>;
+template class Graph<set<pair<pair<char, char>, int>>::iterator, char>;
+template class Graph<vector<pair<pair<char, char>, int>>::iterator, char>;
+template class Graph<set<pair<pair<A, A>, int>>::iterator, A>;

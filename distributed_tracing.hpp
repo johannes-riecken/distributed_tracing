@@ -5,6 +5,7 @@
 #include <map>
 #include <concepts>
 #include <unordered_map>
+#include <limits>
 
 using namespace std;
 
@@ -24,11 +25,11 @@ struct pair_hash {
     }
 };
 
-template <class Iterator, regular Vertex>
+template <input_iterator Iterator, regular Vertex>
 class Graph {
 public:
 
-  explicit Graph<void, Vertex>(vector<pair<pair<Vertex, Vertex>, int>> &edges);
+  explicit Graph<Iterator, Vertex>(Iterator ei_begin, Iterator ei_end);
 
   [[nodiscard]] optional<int> average_latency(const vector<Vertex> &trace) const;
 
@@ -42,4 +43,4 @@ private:
 
 };
 
-Graph<set<pair<pair<char, char>, int>>, char> from_edges_str(string &edges_str);
+Graph<vector<pair<pair<char, char>, int>>::iterator, char> from_edges_str(const string &edges_str);
