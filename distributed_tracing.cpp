@@ -91,17 +91,17 @@ vector<pair<pair<char, char>, int>> parse_edges_str(string &edges_str) {
     return edges_parsed;
 }
 
-Graph<char> from_edges_str(string &edges_str) {
+Graph<void, char> from_edges_str(string &edges_str) {
     auto edges_parsed = parse_edges_str(edges_str);
-    return Graph<char>(edges_parsed);
+    return Graph<void, char>(edges_parsed);
 }
 
-template<regular Vertex>
-Graph<Vertex>::Graph(vector<pair<pair<Vertex, Vertex>, int>> &edges) : graph(edges.begin(), edges.end()) {
+template<class Iterator, regular Vertex>
+Graph<Iterator, Vertex>::Graph(vector<pair<pair<Vertex, Vertex>, int>> &edges) : graph(edges.begin(), edges.end()) {
 }
 
-template <regular Vertex>
-optional<int> Graph<Vertex>::average_latency(const vector<Vertex> &trace) const {
+template <class Iterator, regular Vertex>
+optional<int> Graph<Iterator, Vertex>::average_latency(const vector<Vertex> &trace) const {
     int latency = 0;
     vector<pair<Vertex, Vertex>> edges{};
     transform(trace.begin(), trace.end() - 1, trace.begin() + 1,
@@ -115,8 +115,8 @@ optional<int> Graph<Vertex>::average_latency(const vector<Vertex> &trace) const 
     return f == edges.end() ? optional<int>(latency) : nullopt;
 }
 
-template <regular Vertex>
-vector<vector<Vertex>> Graph<Vertex>::traces(const Vertex start_node, const Vertex end_node, const int min_hops, const int max_hops,
+template <class Iterator, regular Vertex>
+vector<vector<Vertex>> Graph<Iterator, Vertex>::traces(const Vertex start_node, const Vertex end_node, const int min_hops, const int max_hops,
                                    const int max_latency) const {
     vector<vector<Vertex>> frontier{{start_node}};
     vector<vector<Vertex>> ret{};
@@ -156,8 +156,8 @@ vector<vector<Vertex>> Graph<Vertex>::traces(const Vertex start_node, const Vert
     return ret;
 }
 
-template <regular Vertex>
-vector<Vertex> Graph<Vertex>::vertices() const {
+template <class Iterator, regular Vertex>
+vector<Vertex> Graph<Iterator, Vertex>::vertices() const {
     unordered_set<Vertex> m{};
     transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.first; });
     transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.second; });
@@ -210,5 +210,5 @@ namespace std {
     };
 }
 
-template class Graph<char>;
-template class Graph<A>;
+template class Graph<void, char>;
+template class Graph<void, A>;
