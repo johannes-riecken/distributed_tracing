@@ -17,6 +17,7 @@
 #include <sstream>
 #include <tuple>
 #include <unordered_set>
+#include <set>
 
 #include "distributed_tracing.hpp"
 
@@ -91,9 +92,9 @@ vector<pair<pair<char, char>, int>> parse_edges_str(string &edges_str) {
     return edges_parsed;
 }
 
-Graph<void, char> from_edges_str(string &edges_str) {
+Graph<set<pair<pair<char, char>, int>>, char> from_edges_str(string &edges_str) {
     auto edges_parsed = parse_edges_str(edges_str);
-    return Graph<void, char>(edges_parsed);
+    return Graph<set<pair<pair<char, char>, int>>, char>(edges_parsed);
 }
 
 template<class Iterator, regular Vertex>
@@ -210,5 +211,5 @@ namespace std {
     };
 }
 
-template class Graph<void, char>;
-template class Graph<void, A>;
+template class Graph<set<pair<pair<char, char>, int>>, char>;
+template class Graph<set<pair<pair<char, char>, int>>, A>;

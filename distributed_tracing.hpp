@@ -42,4 +42,4 @@ private:
 
 };
 
-Graph<void, char> from_edges_str(string &edges_str);
+Graph<set<pair<pair<char, char>, int>>, char> from_edges_str(string &edges_str);

@@ -8,13 +8,13 @@ using namespace std;
 
 class GraphTest : public ::testing::Test {
 protected:
-  unique_ptr<Graph<void, char>> g;
+  unique_ptr<Graph<set<pair<pair<char, char>, int>>, char>> g;
   static constexpr array<const char, 5> NODES{{'A', 'B', 'C', 'D', 'E'}};
 
     GraphTest() = default;
   void SetUp() override {
     string s{"AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"s};
-    g = make_unique<Graph<void, char>>(from_edges_str(s));
+    g = make_unique<Graph<set<pair<pair<char, char>, int>>, char>>(from_edges_str(s));
   }
 };
 
