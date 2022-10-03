@@ -79,7 +79,7 @@ using namespace std;
 /*   /1* return RUN_ALL_TESTS(); *1/ */
 /* } */
 pair<vector<pair<pair<char, char>, int>>::iterator,
-        vector<pair<pair<char, char>, int>>::iterator> parse_edges_str(const string &edges_str) {
+        vector<pair<pair<char, char>, int>>::iterator> parse_edges_str(const string &edges_str, vector<pair<pair<char, char>, int>>& edges_parsed) {
     vector<string> edges{};
     string token;
     string edges_str_new;
@@ -88,7 +88,6 @@ pair<vector<pair<pair<char, char>, int>>::iterator,
     istringstream ss{edges_str_new};
     istream_iterator<string> it{ss};
     copy(it, istream_iterator<string>{}, back_inserter(edges));
-    vector<pair<pair<char, char>, int>> edges_parsed{};
     transform(edges.begin(), edges.end(), back_inserter(edges_parsed), [](const string &e) {
         char a = e[0];
         char b = e[1];
@@ -98,12 +97,13 @@ pair<vector<pair<pair<char, char>, int>>::iterator,
 }
 
 template<input_iterator Iterator, regular Vertex>
-Graph<Iterator, Vertex>::Graph(Iterator ei_begin, Iterator ei_end) : graph{ei_begin, ei_end}
+Graph<Iterator, Vertex>::Graph(const Iterator& ei_begin, const Iterator& ei_end) : graph{ei_begin, ei_end}
 {
 }
 
 Graph<vector<pair<pair<char, char>, int>>::iterator, char> from_edges_str(const string &edges_str) {
-    auto [ei_begin, ei_end] = parse_edges_str(edges_str);
+    vector<pair<pair<char, char>, int>> edges_parsed{};
+    auto [ei_begin, ei_end] = parse_edges_str(edges_str, edges_parsed);
     return Graph<vector<pair<pair<char, char>, int>>::iterator, char>{ei_begin, ei_end};
 }
 
@@ -220,4 +220,4 @@ namespace std {
 
 template class Graph<set<pair<pair<char, char>, int>>::iterator, char>;
 template class Graph<vector<pair<pair<char, char>, int>>::iterator, char>;
-template class Graph<set<pair<pair<A, A>, int>>::iterator, A>;
+template class Graph<unordered_set<pair<pair<A, A>, int>, pair_hash>::iterator, A>;

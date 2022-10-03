@@ -4,6 +4,9 @@ project(distributed_tracing)
 
 find_library(GTEST_LIBRARY gtest)
 
+add_compile_options(-fsanitize=address -fsanitize=undefined)
+add_link_options(-fsanitize=address -fsanitize=undefined)
+
 enable_testing()
 
 add_executable(distributed_tracing_test distributed_tracing_test.cpp distributed_tracing.cpp)

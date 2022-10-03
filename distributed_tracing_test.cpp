@@ -15,10 +15,6 @@ protected:
             g{Graph<vector<pair<pair<char, char>, int>>::iterator, char>{from_edges_str("AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"s)}}
     {
     };
-  void SetUp() override {
-    string s{"AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"s};
-    g = Graph<vector<pair<pair<char, char>, int>>::iterator, char>{from_edges_str(s)};
-  }
 };
 
 int main(int argc, char **argv) {

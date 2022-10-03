@@ -6,6 +6,7 @@
 #include <concepts>
 #include <unordered_map>
 #include <limits>
+#include <compare>
 
 using namespace std;
 
@@ -29,7 +30,7 @@ template <input_iterator Iterator, regular Vertex>
 class Graph {
 public:
 
-  explicit Graph<Iterator, Vertex>(Iterator ei_begin, Iterator ei_end);
+  explicit Graph<Iterator, Vertex>(const Iterator& ei_begin, const Iterator& ei_end);
 
   [[nodiscard]] optional<int> average_latency(const vector<Vertex> &trace) const;
 
