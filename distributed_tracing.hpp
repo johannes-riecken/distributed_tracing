@@ -26,11 +26,11 @@ struct pair_hash {
     }
 };
 
-template <input_iterator Iterator, regular Vertex>
+template <input_iterator EdgeIterator, regular Vertex>
 class Graph {
 public:
 
-  explicit Graph<Iterator, Vertex>(const Iterator& ei_begin, const Iterator& ei_end);
+  explicit Graph<EdgeIterator, Vertex>(const EdgeIterator& ei_begin, const EdgeIterator& ei_end);
 
   [[nodiscard]] optional<int> average_latency(const vector<Vertex> &trace) const;
 

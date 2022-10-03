@@ -96,8 +96,8 @@ pair<vector<pair<pair<char, char>, int>>::iterator,
     return {edges_parsed.begin(), edges_parsed.end()};
 }
 
-template<input_iterator Iterator, regular Vertex>
-Graph<Iterator, Vertex>::Graph(const Iterator& ei_begin, const Iterator& ei_end) : graph{ei_begin, ei_end}
+template<input_iterator EdgeIterator, regular Vertex>
+Graph<EdgeIterator, Vertex>::Graph(const EdgeIterator& ei_begin, const EdgeIterator& ei_end) : graph{ei_begin, ei_end}
 {
 }
 
@@ -107,8 +107,8 @@ Graph<vector<pair<pair<char, char>, int>>::iterator, char> from_edges_str(const 
     return Graph<vector<pair<pair<char, char>, int>>::iterator, char>{ei_begin, ei_end};
 }
 
-template <input_iterator Iterator, regular Vertex>
-optional<int> Graph<Iterator, Vertex>::average_latency(const vector<Vertex> &trace) const {
+template <input_iterator EdgeIterator, regular Vertex>
+optional<int> Graph<EdgeIterator, Vertex>::average_latency(const vector<Vertex> &trace) const {
     int latency = 0;
     vector<pair<Vertex, Vertex>> edges{};
     transform(trace.begin(), trace.end() - 1, trace.begin() + 1,
@@ -123,8 +123,8 @@ optional<int> Graph<Iterator, Vertex>::average_latency(const vector<Vertex> &tra
     return f == edges.end() ? optional<int>(latency) : nullopt;
 }
 
-template <input_iterator Iterator, regular Vertex>
-vector<vector<Vertex>> Graph<Iterator, Vertex>::traces(const Vertex start_node, const Vertex end_node, const int min_hops, const int max_hops,
+template <input_iterator EdgeIterator, regular Vertex>
+vector<vector<Vertex>> Graph<EdgeIterator, Vertex>::traces(const Vertex start_node, const Vertex end_node, const int min_hops, const int max_hops,
                                    const int max_latency) const {
     vector<vector<Vertex>> frontier{{start_node}};
     vector<vector<Vertex>> ret{};
@@ -164,8 +164,8 @@ vector<vector<Vertex>> Graph<Iterator, Vertex>::traces(const Vertex start_node, 
     return ret;
 }
 
-template <input_iterator Iterator, regular Vertex>
-vector<Vertex> Graph<Iterator, Vertex>::vertices() const {
+template <input_iterator EdgeIterator, regular Vertex>
+vector<Vertex> Graph<EdgeIterator, Vertex>::vertices() const {
     unordered_set<Vertex> m{};
     transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.first; });
     transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.second; });
