@@ -8,11 +8,11 @@ using namespace std;
 
 class GraphTest : public ::testing::Test {
 protected:
-  Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<char>::iterator, char> g;
+  Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<char>::const_iterator, char> g;
   static constexpr array<const char, 5> NODES{{'A', 'B', 'C', 'D', 'E'}};
 
     GraphTest() :
-            g{Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<char>::iterator, char>{from_edges_str("AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"s)}}
+            g{Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<char>::const_iterator, char>{from_edges_str("AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"s)}}
     {
     };
 };
