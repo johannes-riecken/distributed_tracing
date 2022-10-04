@@ -83,17 +83,17 @@ pair<vector<pair<pair<char, char>, int>>::const_iterator,
     vector<string> edges{};
     string token;
     string edges_str_new;
-    copy(edges_str.begin(), edges_str.end(), back_inserter(edges_str_new));
+    copy(edges_str.cbegin(), edges_str.cend(), back_inserter(edges_str_new));
     replace(edges_str_new.begin(), edges_str_new.end(), ',', ' ');
     istringstream ss{edges_str_new};
     istream_iterator<string> it{ss};
     copy(it, istream_iterator<string>{}, back_inserter(edges));
-    transform(edges.begin(), edges.end(), back_inserter(edges_parsed), [](const string &e) {
+    transform(edges.cbegin(), edges.cend(), back_inserter(edges_parsed), [](const string &e) {
         char a = e[0];
         char b = e[1];
         return make_pair<pair<char, char>, int>(pair<char, char>(a, b), stoi(e.substr(2)));
     });
-    return {edges_parsed.begin(), edges_parsed.end()};
+    return {edges_parsed.cbegin(), edges_parsed.cend()};
 }
 
 template<input_iterator EdgeIterator, input_iterator VertexIterator, regular Vertex>
@@ -113,14 +113,14 @@ optional<int> Graph<EdgeIterator, VertexIterator, Vertex>::average_latency(Verte
     vector<pair<Vertex, Vertex>> edges{};
     transform(trace_begin, trace_end - 1, trace_begin + 1,
               back_inserter(edges), [](Vertex a, Vertex b) { return pair<Vertex, Vertex>(a, b); });
-    auto f = find_if(edges.begin(), edges.end(), [&](const auto& edge){
-        if (graph.find(edge) == graph.end()) {
+    auto f = find_if(edges.cbegin(), edges.cend(), [&](const auto& edge){
+        if (graph.find(edge) == graph.cend()) {
             return true;
         }
         latency += (*graph.find(edge)).second;
         return false;
     });
-    return f == edges.end() ? optional<int>(latency) : nullopt;
+    return f == edges.cend() ? optional<int>(latency) : nullopt;
 }
 
 template <input_iterator EdgeIterator, input_iterator VertexIterator, regular Vertex>
@@ -129,14 +129,14 @@ optional<int> Graph<EdgeIterator, VertexIterator, Vertex>::average_latency(const
     vector<pair<Vertex, Vertex>> edges{};
     transform(trace_begin, trace_end - 1, trace_begin + 1,
               back_inserter(edges), [](Vertex a, Vertex b) { return pair<Vertex, Vertex>(a, b); });
-    auto f = find_if(edges.begin(), edges.end(), [&](const auto& edge){
-        if (graph.find(edge) == graph.end()) {
+    auto f = find_if(edges.cbegin(), edges.cend(), [&](const auto& edge){
+        if (graph.find(edge) == graph.cend()) {
             return true;
         }
         latency += (*graph.find(edge)).second;
         return false;
     });
-    return f == edges.end() ? optional<int>(latency) : nullopt;
+    return f == edges.cend() ? optional<int>(latency) : nullopt;
 }
 
 template <input_iterator EdgeIterator, input_iterator VertexIterator, regular Vertex>
@@ -160,10 +160,10 @@ vector<vector<Vertex>> Graph<EdgeIterator, VertexIterator, Vertex>::traces(const
 
 
         new_frontier.erase(remove_if(new_frontier.begin(), new_frontier.end(), [this, &max_latency](auto& nodes) {
-            auto nodes_begin = begin(nodes);
-            auto nodes_end = end(nodes);
-            return graph.find(pair(nodes[nodes.size() - 2], nodes.back())) == graph.end() || *average_latency(nodes_begin, nodes_end) > max_latency;
-        }), new_frontier.end());
+            auto nodes_begin = cbegin(nodes);
+            auto nodes_end = cend(nodes);
+            return graph.find(pair(nodes[nodes.size() - 2], nodes.back())) == graph.cend() || *average_latency(nodes_begin, nodes_end) > max_latency;
+        }), new_frontier.cend());
         frontier = new_frontier;
         if (new_frontier.empty()) {
             break;
@@ -172,11 +172,11 @@ vector<vector<Vertex>> Graph<EdgeIterator, VertexIterator, Vertex>::traces(const
         n_hops += 1;
         if (n_hops >= min_hops) {
             vector<vector<Vertex>> filtered_frontier{};
-            copy_if(frontier.begin(), frontier.end(),
+            copy_if(frontier.cbegin(), frontier.cend(),
                     back_inserter(filtered_frontier),
                     [&](const auto &nodes) { return (nodes.back() == end_node); });
-            ret.insert(ret.end(), filtered_frontier.begin(),
-                       filtered_frontier.end());
+            ret.insert(ret.cend(), filtered_frontier.cbegin(),
+                       filtered_frontier.cend());
         }
     }
     return ret;
@@ -185,10 +185,10 @@ vector<vector<Vertex>> Graph<EdgeIterator, VertexIterator, Vertex>::traces(const
 template <input_iterator EdgeIterator, input_iterator VertexIterator, regular Vertex>
 vector<Vertex> Graph<EdgeIterator, VertexIterator, Vertex>::vertices() const {
     unordered_set<Vertex> m{};
-    transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.first; });
-    transform(graph.begin(), graph.end(), inserter(m, begin(m)), [](const auto &p) { return p.first.second; });
+    transform(graph.cbegin(), graph.cend(), inserter(m, cbegin(m)), [](const auto &p) { return p.first.first; });
+    transform(graph.cbegin(), graph.cend(), inserter(m, cbegin(m)), [](const auto &p) { return p.first.second; });
     vector<Vertex> ret{};
-    copy(m.begin(), m.end(), back_inserter(ret));
+    copy(m.cbegin(), m.cend(), back_inserter(ret));
     return ret;
 }
 
@@ -239,4 +239,4 @@ namespace std {
 //template class Graph<set<pair<pair<char, char>, int>>::iterator, set<char>::iterator, char>;
 template class Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<const char>::const_iterator, char>;
 //template class Graph<unordered_set<pair<pair<A, A>, int>, pair_hash>::iterator, vector<A>::iterator, A>;
-template class Graph<std::__1::__wrap_iter<std::__1::pair<std::__1::pair<char, char>, int> const*>, std::__1::__wrap_iter<char*>, char>;
+//template class Graph<std::__1::__wrap_iter<std::__1::pair<std::__1::pair<char, char>, int> const*>, std::__1::__wrap_iter<char*>, char>;
