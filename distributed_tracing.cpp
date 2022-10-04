@@ -101,10 +101,10 @@ Graph<EdgeIterator, VertexIterator, Vertex>::Graph(const EdgeIterator& ei_begin,
 {
 }
 
-Graph<vector<pair<pair<char, char>, int>>::iterator, vector<char>::iterator, char> from_edges_str(const string &edges_str) {
+Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<char>::iterator, char> from_edges_str(const string &edges_str) {
     vector<pair<pair<char, char>, int>> edges_parsed{};
     auto [ei_begin, ei_end] = parse_edges_str(edges_str, edges_parsed);
-    return Graph<vector<pair<pair<char, char>, int>>::iterator, vector<char>::iterator, char>{ei_begin, ei_end};
+    return Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<char>::iterator, char>{ei_begin, ei_end};
 }
 
 template <input_iterator EdgeIterator, input_iterator VertexIterator, regular Vertex>
@@ -237,5 +237,6 @@ namespace std {
 }
 
 //template class Graph<set<pair<pair<char, char>, int>>::iterator, set<char>::iterator, char>;
-template class Graph<vector<pair<pair<char, char>, int>>::iterator, vector<const char>::iterator, char>;
+template class Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<const char>::iterator, char>;
 //template class Graph<unordered_set<pair<pair<A, A>, int>, pair_hash>::iterator, vector<A>::iterator, A>;
+template class Graph<std::__1::__wrap_iter<std::__1::pair<std::__1::pair<char, char>, int> const*>, std::__1::__wrap_iter<char*>, char>;

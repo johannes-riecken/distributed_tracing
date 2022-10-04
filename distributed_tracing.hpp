@@ -45,4 +45,4 @@ private:
 
 };
 
-Graph<vector<pair<pair<char, char>, int>>::iterator, vector<char>::iterator, char> from_edges_str(const string &edges_str);
+Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<char>::iterator, char> from_edges_str(const string &edges_str);
