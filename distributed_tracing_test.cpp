@@ -24,27 +24,42 @@ int main(int argc, char **argv) {
 
 // 1. The average latency of the trace A-B-C.
 TEST_F(GraphTest, ex1) {
-  ASSERT_EQ(g.average_latency(vector<char>{'A', 'B', 'C'}), 9);
+  vector<char> v{'A', 'B', 'C'};
+  auto v_begin = v.begin();
+  auto v_end = v.end();
+  ASSERT_EQ(g.average_latency(v_begin, v_end), 9);
 }
 
 // 2. The average latency of the trace A-D.
 TEST_F(GraphTest, ex2) {
-  ASSERT_EQ(g.average_latency(vector<char>{'A', 'D'}), 5);
+  vector<char> v{'A', 'D'};
+  auto v_begin = v.begin();
+  auto v_end = v.end();
+  ASSERT_EQ(g.average_latency(v_begin, v_end), 5);
 }
 
 // 3. The average latency of the trace A-D-C.
 TEST_F(GraphTest, ex3) {
-  ASSERT_EQ(g.average_latency(vector<char>{'A', 'D', 'C'}), 13);
+  vector<char> v{'A', 'D', 'C'};
+  auto v_begin = v.begin();
+  auto v_end = v.end();
+  ASSERT_EQ(g.average_latency(v_begin, v_end), 13);
 }
 
 // 4. The average latency of the trace A-E-B-C-D.
 TEST_F(GraphTest, ex4) {
-  ASSERT_EQ(g.average_latency(vector<char>{'A', 'E', 'B', 'C', 'D'}), 22);
+  vector<char> v{'A', 'E', 'B', 'C', 'D'};
+  auto v_begin = v.begin();
+  auto v_end = v.end();
+  ASSERT_EQ(g.average_latency(v_begin, v_end), 22);
 }
 
 // 5. The average latency of the trace A-E-D.
 TEST_F(GraphTest, ex5) {
-  ASSERT_EQ(g.average_latency(vector<char>{'A', 'E', 'D'}), nullopt);
+  vector<char> v{'A', 'E', 'D'};
+  auto v_begin = v.begin();
+  auto v_end = v.end();
+  ASSERT_EQ(g.average_latency(v_begin, v_end), nullopt);
 }
 
 // 6. The number of traces originating in service C and ending in service C * with
@@ -61,10 +76,16 @@ TEST_F(GraphTest, ex7) { ASSERT_EQ(g.traces('A', 'C', 4, 4).size(), 3); }
 TEST_F(GraphTest, ex8) {
   auto traces = g.traces('A', 'C', 0, NODES.size());
   auto shortest_trace_ptr = min_element(
-      traces.begin(), traces.end(), [&](const vector<char>& a, const vector<char>& b) {
-        return g.average_latency(a) < g.average_latency(b);
+      traces.begin(), traces.end(), [&](vector<char>& a, vector<char>& b) {
+          auto a_begin = a.begin();
+          auto a_end = a.end();
+          auto b_begin = b.begin();
+          auto b_end = b.end();
+        return g.average_latency(a_begin, a_end) < g.average_latency(b_begin, b_end);
       });
-  auto min_latency = g.average_latency(*shortest_trace_ptr);
+  auto shortest_trace_ptr_begin = shortest_trace_ptr->begin();
+  auto shortest_trace_ptr_end = shortest_trace_ptr->end();
+  auto min_latency = g.average_latency(shortest_trace_ptr_begin, shortest_trace_ptr_end);
   ASSERT_EQ(min_latency, 9);
 }
 
@@ -73,9 +94,15 @@ TEST_F(GraphTest, ex9) {
   auto traces = g.traces('B', 'B', 0, NODES.size());
   auto shortest_trace_ptr =
       min_element(traces.begin(), traces.end(), [&](auto a, auto b) {
-        return g.average_latency(a) < g.average_latency(b);
+          auto a_begin = a.begin();
+          auto a_end = a.end();
+          auto b_begin = b.begin();
+          auto b_end = b.end();
+          return g.average_latency(a_begin, a_end) < g.average_latency(b_begin, b_end);
       });
-  auto min_latency = g.average_latency(*shortest_trace_ptr);
+  auto shortest_trace_ptr_begin = shortest_trace_ptr->begin();
+  auto shortest_trace_ptr_end = shortest_trace_ptr->end();
+  auto min_latency = g.average_latency(shortest_trace_ptr_begin, shortest_trace_ptr_end);
   ASSERT_EQ(min_latency, 9);
 }
 
@@ -85,7 +112,9 @@ TEST_F(GraphTest, ex9) {
 TEST_F(GraphTest, ex10) {
   auto traces = g.traces('C', 'C', 0, numeric_limits<int>::max(), 29);
   auto count = count_if(traces.begin(), traces.end(), [&](auto trace) {
-    return g.average_latency(trace) < 30;
+      auto trace_begin = trace.begin();
+      auto trace_end = trace.end();
+      return g.average_latency(trace_begin, trace_end) < 30;
   });
   ASSERT_EQ(count, 7);
 }

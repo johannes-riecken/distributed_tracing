@@ -32,7 +32,8 @@ public:
 
   explicit Graph<EdgeIterator, VertexIterator, Vertex>(const EdgeIterator& ei_begin, const EdgeIterator& ei_end);
 
-  [[nodiscard]] optional<int> average_latency(const vector<Vertex> &trace) const;
+    [[nodiscard]] optional<int> average_latency(VertexIterator& trace_begin, VertexIterator& trace_end) const;
+    [[nodiscard]] optional<int> average_latency(const VertexIterator& trace_begin, const VertexIterator& trace_end) const;
 
   [[nodiscard]] vector<vector<Vertex>> traces(Vertex start_node, Vertex end_node, int min_hops,
                               int max_hops,

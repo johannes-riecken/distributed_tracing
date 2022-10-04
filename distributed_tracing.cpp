@@ -108,18 +108,34 @@ Graph<vector<pair<pair<char, char>, int>>::iterator, vector<char>::iterator, cha
 }
 
 template <input_iterator EdgeIterator, input_iterator VertexIterator, regular Vertex>
-optional<int> Graph<EdgeIterator, VertexIterator, Vertex>::average_latency(const vector<Vertex> &trace) const {
+optional<int> Graph<EdgeIterator, VertexIterator, Vertex>::average_latency(VertexIterator& trace_begin, VertexIterator& trace_end) const {
     int latency = 0;
     vector<pair<Vertex, Vertex>> edges{};
-    transform(trace.begin(), trace.end() - 1, trace.begin() + 1,
+    transform(trace_begin, trace_end - 1, trace_begin + 1,
               back_inserter(edges), [](Vertex a, Vertex b) { return pair<Vertex, Vertex>(a, b); });
     auto f = find_if(edges.begin(), edges.end(), [&](const auto& edge){
         if (graph.find(edge) == graph.end()) {
             return true;
         }
-            latency += (*graph.find(edge)).second;
-            return false;
-        });
+        latency += (*graph.find(edge)).second;
+        return false;
+    });
+    return f == edges.end() ? optional<int>(latency) : nullopt;
+}
+
+template <input_iterator EdgeIterator, input_iterator VertexIterator, regular Vertex>
+optional<int> Graph<EdgeIterator, VertexIterator, Vertex>::average_latency(const VertexIterator& trace_begin, const VertexIterator& trace_end) const {
+    int latency = 0;
+    vector<pair<Vertex, Vertex>> edges{};
+    transform(trace_begin, trace_end - 1, trace_begin + 1,
+              back_inserter(edges), [](Vertex a, Vertex b) { return pair<Vertex, Vertex>(a, b); });
+    auto f = find_if(edges.begin(), edges.end(), [&](const auto& edge){
+        if (graph.find(edge) == graph.end()) {
+            return true;
+        }
+        latency += (*graph.find(edge)).second;
+        return false;
+    });
     return f == edges.end() ? optional<int>(latency) : nullopt;
 }
 
@@ -143,8 +159,10 @@ vector<vector<Vertex>> Graph<EdgeIterator, VertexIterator, Vertex>::traces(const
             }
 
 
-        new_frontier.erase(remove_if(new_frontier.begin(), new_frontier.end(), [this, &max_latency](const auto& nodes) {
-            return graph.find(pair(nodes[nodes.size() - 2], nodes.back())) == graph.end() || *average_latency(nodes) > max_latency;
+        new_frontier.erase(remove_if(new_frontier.begin(), new_frontier.end(), [this, &max_latency](auto& nodes) {
+            auto nodes_begin = begin(nodes);
+            auto nodes_end = end(nodes);
+            return graph.find(pair(nodes[nodes.size() - 2], nodes.back())) == graph.end() || *average_latency(nodes_begin, nodes_end) > max_latency;
         }), new_frontier.end());
         frontier = new_frontier;
         if (new_frontier.empty()) {
@@ -218,6 +236,6 @@ namespace std {
     };
 }
 
-template class Graph<set<pair<pair<char, char>, int>>::iterator, set<char>::iterator, char>;
-template class Graph<vector<pair<pair<char, char>, int>>::iterator, vector<char>::iterator, char>;
-template class Graph<unordered_set<pair<pair<A, A>, int>, pair_hash>::iterator, vector<A>::iterator, A>;
+//template class Graph<set<pair<pair<char, char>, int>>::iterator, set<char>::iterator, char>;
+template class Graph<vector<pair<pair<char, char>, int>>::iterator, vector<const char>::iterator, char>;
+//template class Graph<unordered_set<pair<pair<A, A>, int>, pair_hash>::iterator, vector<A>::iterator, A>;
