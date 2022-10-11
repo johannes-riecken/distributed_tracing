@@ -55,6 +55,8 @@ jobs:
     - run: |
         echo "Run, Build Application using script"
         sudo apt-get update && sudo apt-get install -y libgtest-dev
+        sudo rm /usr/bin/g++
+        sudo ln -s /usr/bin/g++-10 /usr/bin/g++
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
