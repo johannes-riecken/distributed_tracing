@@ -185,8 +185,8 @@ vector<vector<Vertex>> Graph<EdgeIterator, VertexIterator, Vertex>::traces(const
 template <input_iterator EdgeIterator, input_iterator VertexIterator, regular Vertex>
 vector<Vertex> Graph<EdgeIterator, VertexIterator, Vertex>::vertices() const {
     unordered_set<Vertex> m{};
-    transform(graph.cbegin(), graph.cend(), inserter(m, cbegin(m)), [](const auto &p) { return p.first.first; });
-    transform(graph.cbegin(), graph.cend(), inserter(m, cbegin(m)), [](const auto &p) { return p.first.second; });
+    transform(graph.cbegin(), graph.cend(), inserter(m, begin(m)), [](const auto &p) { return p.first.first; });
+    transform(graph.cbegin(), graph.cend(), inserter(m, begin(m)), [](const auto &p) { return p.first.second; });
     vector<Vertex> ret{};
     copy(m.cbegin(), m.cend(), back_inserter(ret));
     return ret;
@@ -237,6 +237,6 @@ namespace std {
 }
 
 //template class Graph<set<pair<pair<char, char>, int>>::iterator, set<char>::iterator, char>;
-template class Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<const char>::const_iterator, char>;
+template class Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<char>::const_iterator, char>;
 //template class Graph<unordered_set<pair<pair<A, A>, int>, pair_hash>::iterator, vector<A>::iterator, A>;
 //template class Graph<std::__1::__wrap_iter<std::__1::pair<std::__1::pair<char, char>, int> const*>, std::__1::__wrap_iter<char*>, char>;
