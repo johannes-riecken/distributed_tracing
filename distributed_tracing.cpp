@@ -35,49 +35,6 @@ using namespace std;
   return ss.str();
 }
 
-/* int main() { */
-/*   fstream fs("graph.csv", fstream::in); */
-/*   string graph_str; */
-/*   fs >> graph_str; */
-/*   auto g = make_unique<Graph>(Graph{graph_str}); */
-
-/*   // exercise 1 to 5 */
-/*   const array<vector<char>, 5> traces{vector<char>{'A', 'B', 'C'}, */
-/*                                       {'A', 'D'}, */
-/*                                       {'A', 'D', 'C'}, */
-/*                                       {'A', 'E', 'B', 'C', 'D'}, */
-/*                                       {'A', 'E', 'D'}}; */
-/*   for (const auto &trace : traces) { */
-/*     cout << to_string(g->average_latency(trace)) << endl; */
-/*   } */
-
-/*   // exercises 6 and 7 */
-/*   cout << g->traces('C', 'C', 0, 3).size() << endl; */
-/*   cout << g->traces('A', 'C', 4, 4).size() << endl; */
-
-/*   // exercises 8 and 9 */
-/*   const array<tuple<char, char>, 2> param_tuples{tuple<char, char>{'A', 'C'}, */
-/*                                                  {'B', 'B'}}; */
-/*   for (const auto &param_tuple : param_tuples) { */
-/*     auto trace_candidates = g->traces(get<0>(param_tuple), get<1>(param_tuple), */
-/*                                       0, Graph::NODES.size()); */
-/*     auto shortest_trace_ptr = */
-/*         min_element(trace_candidates.begin(), trace_candidates.end(), */
-/*                     [&](vector<char> a, vector<char> b) { */
-/*                       return *g->average_latency(a) < *g->average_latency(b); */
-/*                     }); */
-/*     cout << to_string(g->average_latency(*shortest_trace_ptr)) << endl; */
-/*   } */
-
-/*   // exercise 10 */
-/*   auto short_traces = g->traces('C', 'C', 0, numeric_limits<int>().max(), 29); */
-/*   cout << count_if(short_traces.begin(), short_traces.end(), [&](auto trace) { */
-/*     return *g->average_latency(trace) < 30; */
-/*   }) << endl; */
-
-/*   /1* ::testing::InitGoogleTest(&argc, argv); *1/ */
-/*   /1* return RUN_ALL_TESTS(); *1/ */
-/* } */
 pair<vector<pair<pair<char, char>, int>>::const_iterator,
         vector<pair<pair<char, char>, int>>::const_iterator> parse_edges_str(const string &edges_str, vector<pair<pair<char, char>, int>>& edges_parsed) {
     vector<string> edges{};
@@ -195,7 +152,6 @@ vector<Vertex> Graph<EdgeIterator, VertexIterator, Vertex>::vertices() const {
 class A
 {
     struct Rslt {
-        /* operator A() { return {}; } */
         Rslt(Rslt&&) = delete;
         void operator&() const = delete;
         friend void operator,(Rslt, Rslt) = delete;
@@ -204,28 +160,10 @@ class A
     static Rslt make() { throw 0; }
 
 public:
-//    A() = delete;
-//    A(A&&) = delete;
-//    A(A const&) = delete;
-//    A& operator=(A &&) = delete;
-//    A& operator=(A const&) = delete;
-    /* ~A() = delete; */
-    /* A() = default; */
-    /* A(A&&) = default; */
-    /* A(A const&) = default; */
-    /* A& operator=(A &&) = default; */
-    /* A& operator=(A const&) = default; */
-    /* ~A() = default; */
-
     void operator&() const = delete;
     friend void operator,(A const&, A const&) = delete;
     // implement equality operators
     friend bool operator==(A const&, A const&) = default;
-
-//    A& operator+=(A const&) { return *this; }
-//    friend Rslt operator+(A, A) { return make(); }
-//
-//    friend auto operator<=>(A const&, A const&) = default;
 };
 
 // std::hash implementation for A
@@ -236,7 +174,4 @@ namespace std {
     };
 }
 
-//template class Graph<set<pair<pair<char, char>, int>>::iterator, set<char>::iterator, char>;
 template class Graph<vector<pair<pair<char, char>, int>>::const_iterator, vector<char>::const_iterator, char>;
-//template class Graph<unordered_set<pair<pair<A, A>, int>, pair_hash>::iterator, vector<A>::iterator, A>;
-//template class Graph<std::__1::__wrap_iter<std::__1::pair<std::__1::pair<char, char>, int> const*>, std::__1::__wrap_iter<char*>, char>;
