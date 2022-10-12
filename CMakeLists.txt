@@ -4,8 +4,10 @@ project(distributed_tracing)
 
 find_library(GTEST_LIBRARY gtest)
 
-add_compile_options(-fsanitize=address -fsanitize=undefined)
-add_link_options(-fsanitize=address -fsanitize=undefined)
+if(APPLE)
+    add_compile_options(-fsanitize=address -fsanitize=undefined)
+    add_link_options(-fsanitize=address -fsanitize=undefined)
+endif()
 
 enable_testing()
 
