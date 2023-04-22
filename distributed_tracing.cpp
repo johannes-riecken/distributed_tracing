@@ -14,12 +14,12 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <optional>
+#include <set>
 #include <sstream>
 #include <tuple>
 #include <unordered_set>
-#include <set>
-#include <iterator>
 
 #include "distributed_tracing.hpp"
 
