@@ -16,6 +16,7 @@
 #include <iostream>
 #include <iterator>
 #include <optional>
+#include <ranges>
 #include <set>
 #include <sstream>
 #include <tuple>
@@ -36,16 +37,16 @@ using namespace std;
 }
 
 pair<vector<pair<pair<char, char>, int>>::const_iterator,
-        vector<pair<pair<char, char>, int>>::const_iterator> parse_edges_str(const string &edges_str, vector<pair<pair<char, char>, int>>& edges_parsed) {
+        vector<pair<pair<char, char>, int>>::const_iterator> parse_edges_str(string_view edges_str, vector<pair<pair<char, char>, int>>& edges_parsed) {
     vector<string> edges{};
     string token;
     string edges_str_new;
-    copy(edges_str.cbegin(), edges_str.cend(), back_inserter(edges_str_new));
-    replace(edges_str_new.begin(), edges_str_new.end(), ',', ' ');
+    ranges::copy(edges_str, back_inserter(edges_str_new));
+    ranges::replace(edges_str_new, ',', ' ');
     istringstream ss{edges_str_new};
     istream_iterator<string> it{ss};
     copy(it, istream_iterator<string>{}, back_inserter(edges));
-    transform(edges.cbegin(), edges.cend(), back_inserter(edges_parsed), [](const string &e) {
+    ranges::transform(edges, back_inserter(edges_parsed), [](const string &e) {
         char a = e[0];
         char b = e[1];
         return make_pair<pair<char, char>, int>(pair<char, char>(a, b), stoi(e.substr(2)));
@@ -70,8 +71,8 @@ optional<int> Graph<EdgeIterator, VertexIterator, Vertex>::average_latency(Verte
     vector<pair<Vertex, Vertex>> edges{};
     transform(trace_begin, trace_end - 1, trace_begin + 1,
               back_inserter(edges), [](Vertex a, Vertex b) { return pair<Vertex, Vertex>(a, b); });
-    auto f = find_if(edges.cbegin(), edges.cend(), [&](const auto& edge){
-        if (graph.find(edge) == graph.cend()) {
+    auto f = ranges::find_if(edges, [&](const auto& edge){
+        if (!graph.contains(edge)) {
             return true;
         }
         latency += (*graph.find(edge)).second;
@@ -86,8 +87,8 @@ optional<int> Graph<EdgeIterator, VertexIterator, Vertex>::average_latency(const
     vector<pair<Vertex, Vertex>> edges{};
     transform(trace_begin, trace_end - 1, trace_begin + 1,
               back_inserter(edges), [](Vertex a, Vertex b) { return pair<Vertex, Vertex>(a, b); });
-    auto f = find_if(edges.cbegin(), edges.cend(), [&](const auto& edge){
-        if (graph.find(edge) == graph.cend()) {
+    auto f = ranges::find_if(edges, [&](const auto& edge){
+        if (!graph.contains(edge)) {
             return true;
         }
         latency += (*graph.find(edge)).second;
@@ -116,11 +117,11 @@ vector<vector<Vertex>> Graph<EdgeIterator, VertexIterator, Vertex>::traces(const
             }
 
 
-        new_frontier.erase(remove_if(new_frontier.begin(), new_frontier.end(), [this, &max_latency](auto& nodes) {
+        erase_if(new_frontier, [this, &max_latency](auto& nodes) {
             auto nodes_begin = cbegin(nodes);
             auto nodes_end = cend(nodes);
-            return graph.find(pair(nodes[nodes.size() - 2], nodes.back())) == graph.cend() || *average_latency(nodes_begin, nodes_end) > max_latency;
-        }), new_frontier.cend());
+            return !graph.contains(pair(nodes[nodes.size() - 2], nodes.back())) || *average_latency(nodes_begin, nodes_end) > max_latency;
+        });
         frontier = new_frontier;
         if (new_frontier.empty()) {
             break;
@@ -129,7 +130,7 @@ vector<vector<Vertex>> Graph<EdgeIterator, VertexIterator, Vertex>::traces(const
         n_hops += 1;
         if (n_hops >= min_hops) {
             vector<vector<Vertex>> filtered_frontier{};
-            copy_if(frontier.cbegin(), frontier.cend(),
+            ranges::copy_if(frontier,
                     back_inserter(filtered_frontier),
                     [&](const auto &nodes) { return (nodes.back() == end_node); });
             ret.insert(ret.cend(), filtered_frontier.cbegin(),
@@ -142,10 +143,10 @@ vector<vector<Vertex>> Graph<EdgeIterator, VertexIterator, Vertex>::traces(const
 template <input_iterator EdgeIterator, input_iterator VertexIterator, regular Vertex>
 vector<Vertex> Graph<EdgeIterator, VertexIterator, Vertex>::vertices() const {
     unordered_set<Vertex> m{};
-    transform(graph.cbegin(), graph.cend(), inserter(m, begin(m)), [](const auto &p) { return p.first.first; });
-    transform(graph.cbegin(), graph.cend(), inserter(m, begin(m)), [](const auto &p) { return p.first.second; });
+    ranges::transform(graph, inserter(m, begin(m)), [](const auto &p) { return p.first.first; });
+    ranges::transform(graph, inserter(m, begin(m)), [](const auto &p) { return p.first.second; });
     vector<Vertex> ret{};
-    copy(m.cbegin(), m.cend(), back_inserter(ret));
+    ranges::copy(m, back_inserter(ret));
     return ret;
 }
 
@@ -157,7 +158,7 @@ class A
         friend void operator,(Rslt, Rslt) = delete;
     };
 
-    static Rslt make() { throw 0; }
+    __attribute__((noreturn)) static Rslt make() { throw 0; }
 
 public:
     void operator&() const = delete;
