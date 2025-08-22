@@ -31,7 +31,7 @@ template <input_iterator EdgeIterator, input_iterator VertexIterator, regular Ve
 class Graph {
 public:
 
-  explicit Graph<EdgeIterator, VertexIterator, Vertex>(const EdgeIterator& ei_begin, const EdgeIterator& ei_end);
+  explicit Graph(const EdgeIterator& ei_begin, const EdgeIterator& ei_end);
 
     [[nodiscard]] optional<int> average_latency(VertexIterator& trace_begin, VertexIterator& trace_end) const;
     [[nodiscard]] optional<int> average_latency(const VertexIterator& trace_begin, const VertexIterator& trace_end) const;

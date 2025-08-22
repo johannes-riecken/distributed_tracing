@@ -1,3 +1,6 @@
+// To run on Compiler Explorer, inline distributed_tracing.hpp and add an empty
+// main.
+//
 // Running the program: Create file graph.csv with one comma-separated line
 // specifying a graph (without spaces). Compile this file with `g++ -std=c++17
 // distributed_tracing.cpp` (I would also gladly provide instructions for
